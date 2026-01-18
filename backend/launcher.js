@@ -55,13 +55,7 @@ function setupWaylandEnvironment() {
   
   const envVars = {
     SDL_VIDEODRIVER: 'wayland',
-    GDK_BACKEND: 'wayland',
-    QT_QPA_PLATFORM: 'wayland',
-    MOZ_ENABLE_WAYLAND: '1',
-    _JAVA_AWT_WM_NONREPARENTING: '1'
   };
-  
-  envVars.ELECTRON_OZONE_PLATFORM_HINT = 'wayland';
   
   console.log('Wayland environment variables:', envVars);
   return envVars;
