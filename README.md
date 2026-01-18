@@ -59,16 +59,13 @@
 3. Launch from desktop or start menu
 
 #### Linux
-See [BUILD.md](BUILD.md) for detailed build instructions.
+See [BUILD.md](BUILD.md) for detailed build instructions or [**Releases**](https://github.com/amiayweb/Hytale-F2P/releases) section.
 
 #### macOS  
-See [BUILD.md](BUILD.md) for detailed build instructions.
+See [BUILD.md](BUILD.md) for detailed build instructions or [**Releases**](https://github.com/amiayweb/Hytale-F2P/releases) section.
 
 #### 🖥️ How to create server (Windows Only)?
-1. Download the server files directly from: `http://3.10.208.30:3002/server`
-2. Replace the existing files in your `HytaleF2P` installation folder
-3. Run the server launcher (.bat) to start hosting your own Hytale server
-4. You will need a third party software like Radmin VPN (check on youtube how to use Radmin VPN).
+See [SERVER.md](SERVER.md)
    
 ### 🎮 Usage
 
