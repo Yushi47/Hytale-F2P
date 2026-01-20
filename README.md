@@ -78,7 +78,14 @@ See [BUILD.md](BUILD.md) for comprehensive build instructions.
 
 ## 📋 Changelog
 
-### 🆕 v2.0.2 *(Latest)*
+### 🆕 v2.0.2a *(Minor Update)*  
+- 🧑‍🚀 **Profiles System** — Added proper profile management: create, switch, and delete profiles. Each profile now has its own **isolated mod list**.  
+- 🔒 **Mod Isolation** — Fixed ModManager so mods are **strictly scoped to the active profile**. Browsing and installing now only affects the selected profile.  
+- 🚨 **Critical Path Fix** — Resolved a macOS bug where mods were being saved to a Windows path (`~/AppData/Local`) instead of `~/Library/Application Support`. Mods now save to the **correct location** and load properly in-game.  
+- 🛡️ **Stability Improvements** — Added an **auto-sync step before every launch** to ensure the physical mods folder always matches the active profile.  
+- 🎨 **UI Enhancements** — Added a **profile selector dropdown** and a **profile management modal**.
+  
+### 🆕 v2.0.2 
 - 🎮 **Discord RPC Integration** - Added Discord Rich Presence with toggle in settings (enabled by default)
 - 🌐 **Cross-Platform Multiplayer** - Added multiplayer patch support for Windows, Linux, and macOS
 - 🎨 **Chat Improvements** - Simplified chat color system
