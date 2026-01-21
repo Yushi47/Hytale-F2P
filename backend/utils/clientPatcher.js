@@ -144,6 +144,29 @@ class ClientPatcher {
   }
 
   /**
+   * Patch Discord invite URLs from .gg/hytale to .gg/MHkEjepMQ7
+   */
+  patchDiscordUrl(data) {
+    let count = 0;
+    const result = Buffer.from(data);
+
+    const oldUrl = '.gg/hytale';
+    const newUrl = '.gg/MHkEjepMQ7';
+
+    const oldUtf16 = this.stringToUtf16LE(oldUrl);
+    const newUtf16 = this.stringToUtf16LE(newUrl);
+
+    const positions = this.findAllOccurrences(result, oldUtf16);
+
+    for (const pos of positions) {
+      newUtf16.copy(result, pos);
+      count++;
+    }
+
+    return { buffer: result, count };
+  }
+
+  /**
    * Check if the client binary has already been patched
    */
   isPatchedAlready(clientPath) {
@@ -256,9 +279,12 @@ class ClientPatcher {
     console.log('Patching domain references...');
     const { buffer: patchedData, count } = this.findAndReplaceDomainSmart(data, ORIGINAL_DOMAIN, newDomain);
 
-    if (count === 0) {
-      console.log('No occurrences of hytale.com found - binary may already be modified or has different format');
-      return { success: true, patchCount: 0, warning: 'No domain occurrences found' };
+    console.log('Patching Discord URLs...');
+    const { buffer: finalData, count: discordCount } = this.patchDiscordUrl(patchedData);
+
+    if (count === 0 && discordCount === 0) {
+      console.log('No occurrences found - binary may already be modified or has different format');
+      return { success: true, patchCount: 0, warning: 'No occurrences found' };
     }
 
     if (progressCallback) {
@@ -266,7 +292,7 @@ class ClientPatcher {
     }
 
     console.log('Writing patched binary...');
-    fs.writeFileSync(clientPath, patchedData);
+    fs.writeFileSync(clientPath, finalData);
 
     this.markAsPatched(clientPath);
 
@@ -274,10 +300,10 @@ class ClientPatcher {
       progressCallback('Patching complete', 100);
     }
 
-    console.log(`Successfully patched ${count} occurrences`);
+    console.log(`Successfully patched ${count} domain occurrences and ${discordCount} Discord URLs`);
     console.log('=== Patching Complete ===');
 
-    return { success: true, patchCount: count };
+    return { success: true, patchCount: count + discordCount };
   }
 
   /**
