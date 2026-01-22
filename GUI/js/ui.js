@@ -500,8 +500,24 @@ function setupUI() {
   setupSidebarLogo();
   setupAnimations();
   setupFirstLaunchHandlers();
+  loadLauncherVersion();
 
   document.body.focus();
+}
+
+// Load launcher version from package.json
+async function loadLauncherVersion() {
+  try {
+    if (window.electronAPI && window.electronAPI.getVersion) {
+      const version = await window.electronAPI.getVersion();
+      const versionElement = document.getElementById('launcherVersion');
+      if (versionElement) {
+        versionElement.textContent = `v${version}`;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load launcher version:', error);
+  }
 }
 
 window.LauncherUI = {

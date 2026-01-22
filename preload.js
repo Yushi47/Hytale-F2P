@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   closeWindow: () => ipcRenderer.invoke('window-close'),
   minimizeWindow: () => ipcRenderer.invoke('window-minimize'),
   maximizeWindow: () => ipcRenderer.invoke('window-maximize'),
+  getVersion: () => ipcRenderer.invoke('get-version'),
   saveUsername: (username) => ipcRenderer.invoke('save-username', username),
   loadUsername: () => ipcRenderer.invoke('load-username'),
   saveChatUsername: (chatUsername) => ipcRenderer.invoke('save-chat-username', chatUsername),

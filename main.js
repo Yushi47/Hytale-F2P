@@ -199,7 +199,9 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
+  const packageJson = require('./package.json');
   console.log('=== HYTALE F2P LAUNCHER STARTED ===');
+  console.log('Launcher version:', packageJson.version);
   console.log('Platform:', process.platform);
   console.log('Architecture:', process.arch);
   console.log('Electron version:', process.versions.electron);
@@ -863,6 +865,11 @@ ipcMain.handle('window-maximize', () => {
       mainWindow.maximize();
     }
   }
+});
+
+ipcMain.handle('get-version', () => {
+  const packageJson = require('./package.json');
+  return packageJson.version;
 });
 
 ipcMain.handle('get-log-directory', () => {
