@@ -167,6 +167,8 @@ function setupSettingsElements() {
   closeLauncherCheck = document.getElementById('closeLauncherCheck');
   gpuPreferenceRadios = document.querySelectorAll('input[name="gpuPreference"]');
   gameBranchRadios = document.querySelectorAll('input[name="gameBranch"]');
+  
+  console.log('[Settings] gameBranchRadios found:', gameBranchRadios.length);
 
 
   // UUID Management elements
@@ -541,7 +543,8 @@ document.addEventListener('DOMContentLoaded', initSettings);
 
 window.SettingsAPI = {
   getCurrentJavaPath,
-  getCurrentPlayerName
+  getCurrentPlayerName,
+  reloadBranch: loadVersionBranch
 };
 
 async function loadCurrentUuid() {
@@ -1078,11 +1081,13 @@ async function loadVersionBranch() {
       console.log('[Settings] Selected branch:', selectedBranch);
       
       // Update radio buttons
-      if (gameBranchRadios) {
+      if (gameBranchRadios && gameBranchRadios.length > 0) {
         gameBranchRadios.forEach(radio => {
           radio.checked = radio.value === selectedBranch;
           console.log(`[Settings] Radio ${radio.value}: ${radio.checked ? 'checked' : 'unchecked'}`);
         });
+      } else {
+        console.warn('[Settings] gameBranchRadios not found or empty');
       }
 
       return selectedBranch;

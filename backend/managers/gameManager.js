@@ -446,7 +446,11 @@ function isGameInstalled(branchOverride = null) {
 }
 
 async function installGame(playerName = 'Player', progressCallback, javaPathOverride, installPathOverride, branchOverride = null) {
-  const branch = branchOverride || loadVersionBranch();
+  console.log(`[InstallGame] branchOverride parameter received: ${branchOverride}`);
+  const loadedBranch = loadVersionBranch();
+  console.log(`[InstallGame] loadVersionBranch() returned: ${loadedBranch}`);
+  const branch = branchOverride || loadedBranch;
+  console.log(`[InstallGame] Final branch selected: ${branch}`);
   const customAppDir = getResolvedAppDir(installPathOverride);
   const customCacheDir = path.join(customAppDir, 'cache');
   const customToolsDir = path.join(customAppDir, 'butler');

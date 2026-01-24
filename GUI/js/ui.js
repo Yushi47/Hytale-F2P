@@ -29,6 +29,15 @@ function showPage(pageId) {
     if (page.id === pageId) {
       page.classList.add('active');
       page.style.display = '';
+      
+      // Reload settings when settings page becomes visible
+      if (pageId === 'settings-page') {
+        console.log('[UI] Settings page activated, reloading branch...');
+        // Dynamically import and call loadVersionBranch from settings
+        if (window.SettingsAPI && window.SettingsAPI.reloadBranch) {
+          window.SettingsAPI.reloadBranch();
+        }
+      }
     } else {
       page.classList.remove('active');
       page.style.display = 'none';
