@@ -20,3 +20,4 @@ backend/patcher/
 # macOS Specific
 .DS_Store
 *.zst.DS_Store
+bun.lock

@@ -6,6 +6,7 @@ let browseJavaBtn;
 let settingsPlayerName;
 let discordRPCCheck;
 let closeLauncherCheck;
+let launcherHwAccelCheck;
 let gpuPreferenceRadios;
 let gameBranchRadios;
 
@@ -30,7 +31,7 @@ function showCustomConfirm(message, title, onConfirm, onCancel = null, confirmTe
   title = title || (window.i18n ? window.i18n.t('confirm.defaultTitle') : 'Confirm Action');
   confirmText = confirmText || (window.i18n ? window.i18n.t('common.confirm') : 'Confirm');
   cancelText = cancelText || (window.i18n ? window.i18n.t('common.cancel') : 'Cancel');
-  
+
   const existingModal = document.querySelector('.custom-confirm-modal');
   if (existingModal) {
     existingModal.remove();
@@ -165,9 +166,10 @@ function setupSettingsElements() {
   settingsPlayerName = document.getElementById('settingsPlayerName');
   discordRPCCheck = document.getElementById('discordRPCCheck');
   closeLauncherCheck = document.getElementById('closeLauncherCheck');
+  launcherHwAccelCheck = document.getElementById('launcherHwAccelCheck');
   gpuPreferenceRadios = document.querySelectorAll('input[name="gpuPreference"]');
   gameBranchRadios = document.querySelectorAll('input[name="gameBranch"]');
-  
+
   console.log('[Settings] gameBranchRadios found:', gameBranchRadios.length);
 
 
@@ -204,6 +206,10 @@ function setupSettingsElements() {
 
   if (closeLauncherCheck) {
     closeLauncherCheck.addEventListener('change', saveCloseLauncher);
+  }
+
+  if (launcherHwAccelCheck) {
+    launcherHwAccelCheck.addEventListener('change', saveLauncherHwAccel);
   }
 
 
@@ -266,7 +272,7 @@ function setupSettingsElements() {
 
 function toggleCustomJava() {
   if (!customJavaOptions) return;
-  
+
   if (customJavaCheck && customJavaCheck.checked) {
     customJavaOptions.style.display = 'block';
   } else {
@@ -329,12 +335,12 @@ async function saveDiscordRPC() {
     if (window.electronAPI && window.electronAPI.saveDiscordRPC && discordRPCCheck) {
       const enabled = discordRPCCheck.checked;
       console.log('Saving Discord RPC setting:', enabled);
-      
+
       const result = await window.electronAPI.saveDiscordRPC(enabled);
-      
+
       if (result && result.success) {
         console.log('Discord RPC setting saved successfully:', enabled);
-        
+
         // Feedback visuel pour l'utilisateur
         if (enabled) {
           const msg = window.i18n ? window.i18n.t('notifications.discordEnabled') : 'Discord Rich Presence enabled';
@@ -391,13 +397,42 @@ async function loadCloseLauncher() {
   }
 }
 
+async function saveLauncherHwAccel() {
+  try {
+    if (window.electronAPI && window.electronAPI.saveLauncherHardwareAcceleration && launcherHwAccelCheck) {
+      const enabled = launcherHwAccelCheck.checked;
+      await window.electronAPI.saveLauncherHardwareAcceleration(enabled);
+
+      const msg = window.i18n ? window.i18n.t('notifications.hwAccelSaved') : 'Setting saved. Please restart the launcher to apply changes.';
+      showNotification(msg, 'success');
+    }
+  } catch (error) {
+    console.error('Error saving hardware acceleration setting:', error);
+    const msg = window.i18n ? window.i18n.t('notifications.hwAccelSaveFailed') : 'Failed to save setting';
+    showNotification(msg, 'error');
+  }
+}
+
+async function loadLauncherHwAccel() {
+  try {
+    if (window.electronAPI && window.electronAPI.loadLauncherHardwareAcceleration) {
+      const enabled = await window.electronAPI.loadLauncherHardwareAcceleration();
+      if (launcherHwAccelCheck) {
+        launcherHwAccelCheck.checked = enabled;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading hardware acceleration setting:', error);
+  }
+}
+
 
 async function savePlayerName() {
   try {
     if (!window.electronAPI || !settingsPlayerName) return;
-    
+
     const playerName = settingsPlayerName.value.trim();
-    
+
     if (!playerName) {
       const msg = window.i18n ? window.i18n.t('notifications.playerNameRequired') : 'Please enter a valid player name';
       showNotification(msg, 'error');
@@ -407,7 +442,7 @@ async function savePlayerName() {
     await window.electronAPI.saveUsername(playerName);
     const successMsg = window.i18n ? window.i18n.t('notifications.playerNameSaved') : 'Player name saved successfully';
     showNotification(successMsg, 'success');
-    
+
   } catch (error) {
     console.error('Error saving player name:', error);
     const errorMsg = window.i18n ? window.i18n.t('notifications.playerNameSaveFailed') : 'Failed to save player name';
@@ -418,7 +453,7 @@ async function savePlayerName() {
 async function loadPlayerName() {
   try {
     if (!window.electronAPI || !settingsPlayerName) return;
-    
+
     const savedName = await window.electronAPI.loadUsername();
     if (savedName) {
       settingsPlayerName.value = savedName;
@@ -507,6 +542,7 @@ async function loadAllSettings() {
   await loadCurrentUuid();
   await loadDiscordRPC();
   await loadCloseLauncher();
+  await loadLauncherHwAccel();
   await loadGpuPreference();
   await loadVersionBranch();
 }
@@ -583,7 +619,7 @@ async function regenerateCurrentUuid() {
       const title = window.i18n ? window.i18n.t('confirm.regenerateUuidTitle') : 'Generate New UUID';
       const confirmBtn = window.i18n ? window.i18n.t('confirm.regenerateUuidButton') : 'Generate';
       const cancelBtn = window.i18n ? window.i18n.t('common.cancel') : 'Cancel';
-      
+
       showCustomConfirm(
         message,
         title,
@@ -614,7 +650,7 @@ async function performRegenerateUuid() {
       if (modalCurrentUuid) modalCurrentUuid.value = result.uuid;
       const msg = window.i18n ? window.i18n.t('notifications.uuidGenerated') : 'New UUID generated successfully!';
       showNotification(msg, 'success');
-      
+
       if (uuidModal && uuidModal.style.display !== 'none') {
         await loadAllUuids();
       }
@@ -652,7 +688,7 @@ function closeUuidModal() {
 async function loadAllUuids() {
   try {
     if (!uuidList) return;
-    
+
     uuidList.innerHTML = `
       <div class="uuid-loading">
         <i class="fas fa-spinner fa-spin"></i>
@@ -662,7 +698,7 @@ async function loadAllUuids() {
 
     if (window.electronAPI && window.electronAPI.getAllUuidMappings) {
       const mappings = await window.electronAPI.getAllUuidMappings();
-      
+
       if (mappings.length === 0) {
         uuidList.innerHTML = `
           <div class="uuid-loading">
@@ -674,11 +710,11 @@ async function loadAllUuids() {
       }
 
       uuidList.innerHTML = '';
-      
+
       for (const mapping of mappings) {
         const item = document.createElement('div');
         item.className = `uuid-list-item${mapping.isCurrent ? ' current' : ''}`;
-        
+
         item.innerHTML = `
           <div class="uuid-item-info">
             <div class="uuid-item-username">${escapeHtml(mapping.username)}</div>
@@ -694,7 +730,7 @@ async function loadAllUuids() {
             </button>` : ''}
           </div>
         `;
-        
+
         uuidList.appendChild(item);
       }
     }
@@ -737,7 +773,7 @@ async function setCustomUuid() {
     }
 
     const uuid = customUuidInput.value.trim();
-    
+
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(uuid)) {
       const msg = window.i18n ? window.i18n.t('notifications.uuidInvalidFormat') : 'Invalid UUID format';
@@ -767,33 +803,33 @@ async function setCustomUuid() {
   }
 }
 
-  async function performSetCustomUuid(uuid) {
-    try {
-      if (window.electronAPI && window.electronAPI.setUuidForUser) {
-        const username = getCurrentPlayerName();
-        const result = await window.electronAPI.setUuidForUser(username, uuid);
-        
-        if (result.success) {
-          if (currentUuidDisplay) currentUuidDisplay.value = uuid;
-          if (modalCurrentUuid) modalCurrentUuid.value = uuid;
-          if (customUuidInput) customUuidInput.value = '';
-          
-          const msg = window.i18n ? window.i18n.t('notifications.uuidSetSuccess') : 'Custom UUID set successfully!';
-          showNotification(msg, 'success');
-          
-          await loadAllUuids();
-        } else {
-          throw new Error(result.error || 'Failed to set custom UUID');
-        }
-      }
-    } catch (error) {
-      console.error('Error setting custom UUID:', error);
-      const msg = window.i18n ? window.i18n.t('notifications.uuidSetFailed').replace('{error}', error.message) : `Failed to set custom UUID: ${error.message}`;
-      showNotification(msg, 'error');
-    }
-  }
+async function performSetCustomUuid(uuid) {
+  try {
+    if (window.electronAPI && window.electronAPI.setUuidForUser) {
+      const username = getCurrentPlayerName();
+      const result = await window.electronAPI.setUuidForUser(username, uuid);
 
-window.copyUuid = async function(uuid) {
+      if (result.success) {
+        if (currentUuidDisplay) currentUuidDisplay.value = uuid;
+        if (modalCurrentUuid) modalCurrentUuid.value = uuid;
+        if (customUuidInput) customUuidInput.value = '';
+
+        const msg = window.i18n ? window.i18n.t('notifications.uuidSetSuccess') : 'Custom UUID set successfully!';
+        showNotification(msg, 'success');
+
+        await loadAllUuids();
+      } else {
+        throw new Error(result.error || 'Failed to set custom UUID');
+      }
+    }
+  } catch (error) {
+    console.error('Error setting custom UUID:', error);
+    const msg = window.i18n ? window.i18n.t('notifications.uuidSetFailed').replace('{error}', error.message) : `Failed to set custom UUID: ${error.message}`;
+    showNotification(msg, 'error');
+  }
+}
+
+window.copyUuid = async function (uuid) {
   try {
     if (navigator.clipboard) {
       await navigator.clipboard.writeText(uuid);
@@ -807,13 +843,13 @@ window.copyUuid = async function(uuid) {
   }
 };
 
-window.deleteUuid = async function(username) {
+window.deleteUuid = async function (username) {
   try {
     const message = window.i18n ? window.i18n.t('confirm.deleteUuidMessage').replace('{username}', username) : `Are you sure you want to delete the UUID for "${username}"? This action cannot be undone.`;
     const title = window.i18n ? window.i18n.t('confirm.deleteUuidTitle') : 'Delete UUID';
     const confirmBtn = window.i18n ? window.i18n.t('confirm.deleteUuidButton') : 'Delete';
     const cancelBtn = window.i18n ? window.i18n.t('common.cancel') : 'Cancel';
-    
+
     showCustomConfirm(
       message,
       title,
@@ -834,21 +870,21 @@ window.deleteUuid = async function(username) {
 async function performDeleteUuid(username) {
   try {
     if (window.electronAPI && window.electronAPI.deleteUuidForUser) {
-        const result = await window.electronAPI.deleteUuidForUser(username);
-        
-        if (result.success) {
-          const msg = window.i18n ? window.i18n.t('notifications.uuidDeleteSuccess') : 'UUID deleted successfully!';
-          showNotification(msg, 'success');
-          await loadAllUuids();
-        } else {
-          throw new Error(result.error || 'Failed to delete UUID');
-        }
+      const result = await window.electronAPI.deleteUuidForUser(username);
+
+      if (result.success) {
+        const msg = window.i18n ? window.i18n.t('notifications.uuidDeleteSuccess') : 'UUID deleted successfully!';
+        showNotification(msg, 'success');
+        await loadAllUuids();
+      } else {
+        throw new Error(result.error || 'Failed to delete UUID');
       }
-    } catch (error) {
-      console.error('Error deleting UUID:', error);
-      const msg = window.i18n ? window.i18n.t('notifications.uuidDeleteFailed').replace('{error}', error.message) : `Failed to delete UUID: ${error.message}`;
-      showNotification(msg, 'error');
     }
+  } catch (error) {
+    console.error('Error deleting UUID:', error);
+    const msg = window.i18n ? window.i18n.t('notifications.uuidDeleteFailed').replace('{error}', error.message) : `Failed to delete UUID: ${error.message}`;
+    showNotification(msg, 'error');
+  }
 }
 
 function escapeHtml(text) {
@@ -915,10 +951,10 @@ async function handleBranchChange(event) {
   }
 
   // Confirm branch change
-  const branchName = window.i18n ? 
-    window.i18n.t(`settings.branch${newBranch === 'pre-release' ? 'PreRelease' : 'Release'}`) : 
+  const branchName = window.i18n ?
+    window.i18n.t(`settings.branch${newBranch === 'pre-release' ? 'PreRelease' : 'Release'}`) :
     newBranch;
-  
+
   const message = window.i18n ?
     window.i18n.t('settings.branchWarning') :
     'Changing branch will download and install a different game version';
@@ -946,7 +982,7 @@ async function switchBranch(newBranch) {
     const switchingMsg = window.i18n ?
       window.i18n.t('settings.branchSwitching').replace('{branch}', newBranch) :
       `Switching to ${newBranch}...`;
-    
+
     showNotification(switchingMsg, 'info');
 
     // Lock play button
@@ -960,14 +996,14 @@ async function switchBranch(newBranch) {
 
     // Suggest reinstalling
     setTimeout(() => {
-      const branchLabel = newBranch === 'release' ? 
-        (window.i18n ? window.i18n.t('install.releaseVersion') : 'Release') : 
+      const branchLabel = newBranch === 'release' ?
+        (window.i18n ? window.i18n.t('install.releaseVersion') : 'Release') :
         (window.i18n ? window.i18n.t('install.preReleaseVersion') : 'Pre-Release');
-      
+
       const confirmMsg = window.i18n ?
         window.i18n.t('settings.branchInstallConfirm').replace('{branch}', branchLabel) :
         `The game will be installed for the ${branchLabel} branch. Continue?`;
-      
+
       showCustomConfirm(
         confirmMsg,
         window.i18n ? window.i18n.t('settings.installRequired') : 'Installation Required',
@@ -980,31 +1016,31 @@ async function switchBranch(newBranch) {
           try {
             const playerName = await window.electronAPI.loadUsername();
             const result = await window.electronAPI.installGame(playerName || 'Player', '', '', newBranch);
-            
+
             if (result.success) {
               // Save branch ONLY after successful installation
               await window.electronAPI.saveVersionBranch(newBranch);
-              
+
               const switchedMsg = window.i18n ?
                 window.i18n.t('settings.branchSwitched').replace('{branch}', newBranch) :
                 `Switched to ${newBranch} successfully!`;
-              
-              const successMsg = window.i18n ? 
-                window.i18n.t('progress.installationComplete') : 
+
+              const successMsg = window.i18n ?
+                window.i18n.t('progress.installationComplete') :
                 'Installation completed successfully!';
-              
+
               showNotification(switchedMsg, 'success');
               showNotification(successMsg, 'success');
-              
+
               // Refresh radio buttons to reflect the new branch
               await loadVersionBranch();
               console.log('[Settings] Radio buttons updated after branch switch');
-              
+
               setTimeout(() => {
                 if (window.LauncherUI) {
                   window.LauncherUI.hideProgress();
                 }
-                
+
                 // Unlock play button
                 const playButton = document.getElementById('playButton');
                 if (playButton) {
@@ -1017,16 +1053,16 @@ async function switchBranch(newBranch) {
             }
           } catch (error) {
             console.error('Installation error:', error);
-            const errorMsg = window.i18n ? 
-              window.i18n.t('progress.installationFailed').replace('{error}', error.message) : 
+            const errorMsg = window.i18n ?
+              window.i18n.t('progress.installationFailed').replace('{error}', error.message) :
               `Installation failed: ${error.message}`;
-            
+
             showNotification(errorMsg, 'error');
-            
+
             if (window.LauncherUI) {
               window.LauncherUI.hideProgress();
             }
-            
+
             // Revert radio selection to old branch
             loadVersionBranch().then(oldBranch => {
               const radioToCheck = document.querySelector(`input[name="gameBranch"][value="${oldBranch}"]`);
@@ -1034,7 +1070,7 @@ async function switchBranch(newBranch) {
                 radioToCheck.checked = true;
               }
             });
-            
+
             // Unlock play button
             const playButton = document.getElementById('playButton');
             if (playButton) {
@@ -1075,11 +1111,11 @@ async function loadVersionBranch() {
     if (window.electronAPI && window.electronAPI.loadVersionBranch) {
       const branch = await window.electronAPI.loadVersionBranch();
       console.log('[Settings] Loaded version_branch from config:', branch);
-      
+
       // Use default if branch is null/undefined
       const selectedBranch = branch || 'release';
       console.log('[Settings] Selected branch:', selectedBranch);
-      
+
       // Update radio buttons
       if (gameBranchRadios && gameBranchRadios.length > 0) {
         gameBranchRadios.forEach(radio => {

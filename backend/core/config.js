@@ -166,13 +166,22 @@ function loadCloseLauncherOnStart() {
   return config.closeLauncherOnStart !== undefined ? config.closeLauncherOnStart : false;
 }
 
+function saveLauncherHardwareAcceleration(enabled) {
+  saveConfig({ launcherHardwareAcceleration: !!enabled });
+}
+
+function loadLauncherHardwareAcceleration() {
+  const config = loadConfig();
+  return config.launcherHardwareAcceleration !== undefined ? config.launcherHardwareAcceleration : true;
+}
+
 function saveModsToConfig(mods) {
   try {
     const config = loadConfig();
 
-  // Config migration handles structure, but mod saves must go to the ACTIVE profile.
-  // Global installedMods is kept mainly for reference/migration.
-  // The profile is the source of truth for enabled mods.
+    // Config migration handles structure, but mod saves must go to the ACTIVE profile.
+    // Global installedMods is kept mainly for reference/migration.
+    // The profile is the source of truth for enabled mods.
 
 
     if (config.activeProfileId && config.profiles && config.profiles[config.activeProfileId]) {
@@ -369,6 +378,11 @@ module.exports = {
   // Close Launcher export
   saveCloseLauncherOnStart,
   loadCloseLauncherOnStart,
+
+  // Hardware Acceleration functions
+  saveLauncherHardwareAcceleration,
+  loadLauncherHardwareAcceleration,
+
   // Version Management exports
   saveVersionClient,
   loadVersionClient,

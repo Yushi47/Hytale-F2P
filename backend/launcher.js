@@ -19,6 +19,12 @@ const {
   loadLanguage,
   saveCloseLauncherOnStart,
   loadCloseLauncherOnStart,
+
+  // Hardware Acceleration
+  saveLauncherHardwareAcceleration,
+  loadLauncherHardwareAcceleration,
+
+
   saveModsToConfig,
   loadModsFromConfig,
   getUuidForUser,
@@ -125,20 +131,24 @@ module.exports = {
   // Discord RPC functions
   saveDiscordRPC,
   loadDiscordRPC,
-  
+
   // Language functions
   saveLanguage,
   loadLanguage,
-  
+
   // Close Launcher functions
   saveCloseLauncherOnStart,
   loadCloseLauncherOnStart,
-  
+
+  // Hardware Acceleration functions
+  saveLauncherHardwareAcceleration,
+  loadLauncherHardwareAcceleration,
+
   // GPU Preference functions
   saveGpuPreference,
   loadGpuPreference,
   detectGpu,
-  
+
   // Version functions
   getLatestClientVersion,
   saveVersionClient,

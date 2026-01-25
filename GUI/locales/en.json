@@ -131,6 +131,8 @@
     "closeLauncher": "Launcher Behavior",
     "closeOnStart": "Close Launcher on game start",
     "closeOnStartDescription": "Automatically close the launcher after Hytale has launched",
+    "hwAccel": "Hardware Acceleration",
+    "hwAccelDescription": "Enable hardware acceleration for the launcher",
     "gameBranch": "Game Branch",
     "branchRelease": "Release",
     "branchPreRelease": "Pre-Release",
@@ -207,7 +209,9 @@
     "modsDownloadFailed": "Failed to download mod: {error}",
     "modsToggleFailed": "Failed to toggle mod: {error}",
     "modsDeleteFailed": "Failed to delete mod: {error}",
-    "modsModNotFound": "Mod information not found"
+    "modsModNotFound": "Mod information not found",
+    "hwAccelSaved": "Hardware acceleration setting saved",
+    "hwAccelSaveFailed": "Failed to save hardware acceleration setting"
   },
   "confirm": {
     "defaultTitle": "Confirm action",

@@ -23,6 +23,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   loadLanguage: () => ipcRenderer.invoke('load-language'),
   saveCloseLauncher: (enabled) => ipcRenderer.invoke('save-close-launcher', enabled),
   loadCloseLauncher: () => ipcRenderer.invoke('load-close-launcher'),
+
+  // Harwadre Acceleration
+  saveLauncherHardwareAcceleration: (enabled) => ipcRenderer.invoke('save-launcher-hw-accel', enabled),
+  loadLauncherHardwareAcceleration: () => ipcRenderer.invoke('load-launcher-hw-accel'),
+
   selectInstallPath: () => ipcRenderer.invoke('select-install-path'),
   browseJavaPath: () => ipcRenderer.invoke('browse-java-path'),
   isGameInstalled: () => ipcRenderer.invoke('is-game-installed'),
