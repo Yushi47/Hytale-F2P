@@ -109,7 +109,7 @@ jobs:
           sudo -u builder bash << 'EOF'
           set -e
           makepkg --printsrcinfo > .SRCINFO
-          makepkg -sS --noconfirm
+          makepkg -s --noconfirm
           EOF
 
       - name: Fix permissions for upload
@@ -123,7 +123,6 @@ jobs:
           name: arch-package
           path: |
             *.pkg.tar.zst
-            *.src.tar.zst
             .SRCINFO
           include-hidden-files: true
 
