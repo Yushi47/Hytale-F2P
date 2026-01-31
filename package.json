@@ -25,8 +25,7 @@
     "cross-platform",
     "electron",
     "auto-update",
-    "mod-manager",
-    "chat"
+    "mod-manager"
   ],
   "maintainers": [
     {
@@ -79,9 +78,18 @@
     },
     "linux": {
       "target": [
-        "AppImage",
-        "deb",
-        "rpm"
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        },
+        {
+          "target": "rpm",
+          "arch": ["x64"]
+        }
       ],
       "icon": "build/icon.png",
       "category": "Game"
